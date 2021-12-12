@@ -1,0 +1,62 @@
+/**
+ * Description: Finds the lowest common ancestor of two nodes in a tree.
+ * Author: smax
+ * Source: https://github.com/kth-competitive-programming/kactl/blob/master/content/graph/LCA.h
+ * Verification: https://www.spoj.com/problems/LCA/
+ * Time: O(n log n) preprocessing, O(1) query
+ */
+
+#include "../data-structures/RMQ.h"
+
+struct LCA {
+    int n;
+    vector<int> in, out, depth, path, ret;
+    vector<vector<int>> adj;
+    RMQ<int> rmq;
+
+    LCA(int _n) : n(_n), in(n, -1), out(n), depth(n), adj(n), rmq({}) {}
+
+    void addEdge(int u, int v) {
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    void init(int r = -1) {
+        if (r == -1) {
+            for (int u=0; u<n; u++)
+                if (in[u] == -1)
+                    dfs(u, -1);
+        } else {
+            dfs(r, -1);
+        }
+        rmq = RMQ<int>(ret);
+    }
+
+    void dfs(int u, int p) {
+        in[u] = (int) path.size();
+        path.push_back(u);
+        ret.push_back(in[u]);
+        for (int v : adj[u])
+            if (v != p) {
+                depth[v] = depth[u] + 1;
+                dfs(v, u);
+                path.push_back(u);
+                ret.push_back(in[u]);
+            }
+        out[u] = (int) path.size();
+    }
+
+    int lca(int u, int v) {
+        if (in[u] > in[v])
+            swap(u, v);
+        return path[rmq.query(in[u], in[v])];
+    }
+
+    int dist(int u, int v) {
+        return depth[u] + depth[v] - 2 * depth[lca(u, v)];
+    }
+
+    bool anc(int u, int v) {
+        return in[u] <= in[v] && out[v] <= out[u];
+    }
+};
