@@ -1,6 +1,5 @@
 /**
  * Description: A polynomial hash function for strings.
- * Author: smax
  * Source: https://codeforces.com/blog/entry/60445
  * Verification: https://acm.timus.ru/problem.aspx?space=1&num=1517
  */
@@ -37,6 +36,13 @@ uint64_t mul(uint64_t a, uint64_t b) {
     return ret - 1;
 }
 
-// A string with characters c_1 c_2 c_3 c_4 is encoded as c_1 * BASE^3 + c_2 * BASE^2 + c_3 * BASE + c_4
+uint64_t getHash(const string &s) {
+    uint64_t ret = 0;
+    for (char c : s)
+        ret = add(mul(ret, BASE), c);
+    return ret;
+}
+
+// A string with characters c_0 c_1 c_2 c_3 is encoded as c_0 * BASE^3 + c_1 * BASE^2 + c_2 * BASE + c_3
 // If you precomopute all prefixes, then you can get any substring from index i with length L
 // pref[i + L - 1] - pref[i - 1] * BASE^L
